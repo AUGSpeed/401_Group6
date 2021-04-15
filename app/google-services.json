@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "824779837773",
+    "project_id": "audioapp-6d48b",
+    "storage_bucket": "audioapp-6d48b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824779837773:android:d696837c83e8477bbee704",
+        "android_client_info": {
+          "package_name": "com.example.audiotracks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "824779837773-qb95ga34p6mc9m6b9d2mj7bub1sjggfg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.audiotracks",
+            "certificate_hash": "7072d34dbda1f6916d1302cfc5674f45306cb8ab"
+          }
+        },
+        {
+          "client_id": "824779837773-9p3sg536ampbufbgr2f9oba674dnuv55.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxwCLbWuMQ4e-jWl_bUsVsh3JBf9ZvcgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "824779837773-9p3sg536ampbufbgr2f9oba674dnuv55.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
