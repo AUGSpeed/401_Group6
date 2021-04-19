@@ -2,11 +2,14 @@ package com.example.audiotracks;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -14,18 +17,48 @@ import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.annotations.Nullable;
+
 public class MainActivity extends AppCompatActivity {
     Button popupButton;
 
     public static final int TEXT_REQUEST = 1;
     public static final String EXTRA_MESSAGE =
             "com.example.audiotracks.extra.MESSAGE";
+    //FireBase instance variable
+    private FirebaseAuth mFirebaseAuth;
+    public static final String ANONYMOUS = "anonymous";
+
+    private SharedPreferences mSharedPreferences;
+    private GoogleSignInClient mSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button loginButton = findViewById(R.id.login);
+      // Initialize Firebase Auth and check if the user is signed in
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        if (mFirebaseAuth.getCurrentUser() == null) {
+            // Not signed in, launch the Sign In activity
+            startActivity(new Intent(this, SignInActivity.class));
+            finish();
+            return;
+        }
+
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mSignInClient = GoogleSignIn.getClient(this, gso);  
+      Button loginButton = findViewById(R.id.login);
     }
 
     public void popupMenuExample(View view) {
@@ -44,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 else if (item.getTitle().toString().equals("Login")) {
-                    cloudLogin();
+                   // cloudLogin();
                     return true;
                 }
                 else {
@@ -93,4 +126,24 @@ public class MainActivity extends AppCompatActivity {
                 .create();
         dialog.show();
     }
+
+    @Nullable
+    private String getUserPhotoUrl() {
+        FirebaseUser user = mFirebaseAuth.getCurrentUser();
+        if (user != null && user.getPhotoUrl() != null) {
+            return user.getPhotoUrl().toString();
+        }
+
+        return null;
+    }
+
+    private String getUserName() {
+        FirebaseUser user = mFirebaseAuth.getCurrentUser();
+        if (user != null) {
+            return user.getDisplayName();
+        }
+
+        return ANONYMOUS;
+    }
+
 }
