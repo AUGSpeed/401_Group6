@@ -41,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Initialize Firebase Auth and check if the user is signed in
+      // Initialize Firebase Auth and check if the user is signed in
         mFirebaseAuth = FirebaseAuth.getInstance();
         if (mFirebaseAuth.getCurrentUser() == null) {
             // Not signed in, launch the Sign In activity
@@ -58,9 +57,8 @@ public class MainActivity extends AppCompatActivity {
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        mSignInClient = GoogleSignIn.getClient(this, gso);
-
-
+        mSignInClient = GoogleSignIn.getClient(this, gso);  
+      Button loginButton = findViewById(R.id.login);
     }
 
     public void popupMenuExample(View view) {
