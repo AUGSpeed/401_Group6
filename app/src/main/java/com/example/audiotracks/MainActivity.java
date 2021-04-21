@@ -14,7 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -23,6 +25,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.annotations.Nullable;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
     Button popupButton;
@@ -41,24 +45,33 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // This is just a test to see if we can create multiple projects here. Spoiler, we can.
+        LinearLayout projectView = (LinearLayout)findViewById(R.id.projectView);
+        Project test = new Project();
+        test.setName("This is a test");
+        TextView ed = new TextView(this);
+        ed.setText(test.name);
+        projectView.addView(ed);
       // Initialize Firebase Auth and check if the user is signed in
         mFirebaseAuth = FirebaseAuth.getInstance();
         if (mFirebaseAuth.getCurrentUser() == null) {
             // Not signed in, launch the Sign In activity
+            System.out.println("not logged in");
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
         }
+        else{
+            System.out.println("Logged in");
+            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        mSignInClient = GoogleSignIn.getClient(this, gso);  
-      Button loginButton = findViewById(R.id.login);
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build();
+            mSignInClient = GoogleSignIn.getClient(this, gso);
+            Button loginButton = findViewById(R.id.login);
+        }
     }
 
     public void popupMenuExample(View view) {
