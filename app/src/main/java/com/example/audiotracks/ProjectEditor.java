@@ -28,6 +28,8 @@ public class ProjectEditor extends AppCompatActivity {
     MediaPlayer mediaPlayer;
     String pathSave="";
     final int REQUEST_PERMISSION_CODE = 1236;
+    int currentTrack=1;
+    String projectTitle="";
 
 
 
@@ -40,6 +42,9 @@ public class ProjectEditor extends AppCompatActivity {
         Button mainButton = findViewById(R.id.project_button);
         mainButton.setText(message);
         requestPermission();
+        Button track1 = findViewById(R.id.track1);
+        track1.setEnabled(false);
+        projectTitle=message;
     }
 
     public void playFunction(View view)
@@ -48,8 +53,10 @@ public class ProjectEditor extends AppCompatActivity {
         Button recordButton = findViewById(R.id.record_button);
         recordButton.setEnabled(false);
         mediaPlayer = new MediaPlayer();
+        String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
+                + projectTitle + "_audio_record" + currentTrack + ".3gp";
         try {
-            mediaPlayer.setDataSource(pathSave);
+            mediaPlayer.setDataSource(pathLoad);
             mediaPlayer.prepare();
 
 
@@ -75,6 +82,12 @@ public class ProjectEditor extends AppCompatActivity {
     public void stopFunction(View view)
     {
         System.out.println("Stopping Audio...");
+        Button recordButton = findViewById(R.id.record_button);
+        recordButton.setEnabled(true);
+        if(mediaPlayer!=null){
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
     }
 
     public void recordFunction(View view)
@@ -85,7 +98,7 @@ public class ProjectEditor extends AppCompatActivity {
             if (recordButton.getText().toString().equals("Record")) {
 
                 pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
-                        + UUID.randomUUID().toString() + "_audio_record.3gp";
+                        + projectTitle + "_audio_record" + currentTrack + ".3gp";
                 setupMediaRecorder();
                 try {
                     mediaRecorder.prepare();
@@ -102,6 +115,7 @@ public class ProjectEditor extends AppCompatActivity {
                 try {
                     mediaRecorder.stop();
                     mediaRecorder.release();
+                    mediaRecorder = null;
                 } catch (IllegalStateException ise) {
                     ise.printStackTrace();
                 }
@@ -202,5 +216,33 @@ public class ProjectEditor extends AppCompatActivity {
     public void deleteFunction()
     {
         System.out.println("Deleting...");
+    }
+
+    public void selectTrack1(View view) {
+        Button track1 = findViewById(R.id.track1);
+        Button track2 = findViewById(R.id.track2);
+        Button track3 = findViewById(R.id.track3);
+        track1.setEnabled(false);
+        track2.setEnabled(true);
+        track3.setEnabled(true);
+        currentTrack=1;
+    }
+    public void selectTrack2(View view) {
+        Button track1 = findViewById(R.id.track1);
+        Button track2 = findViewById(R.id.track2);
+        Button track3 = findViewById(R.id.track3);
+        track1.setEnabled(true);
+        track2.setEnabled(false);
+        track3.setEnabled(true);
+        currentTrack=2;
+    }
+    public void selectTrack3(View view) {
+        Button track1 = findViewById(R.id.track1);
+        Button track2 = findViewById(R.id.track2);
+        Button track3 = findViewById(R.id.track3);
+        track1.setEnabled(true);
+        track2.setEnabled(true);
+        track3.setEnabled(false);
+        currentTrack=3;
     }
 }
