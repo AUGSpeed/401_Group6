@@ -46,20 +46,32 @@ public class ProjectEditor extends AppCompatActivity {
     {
         Button playButton = findViewById(R.id.play_button);
         Button recordButton = findViewById(R.id.record_button);
-        recordButton.setEnabled(false);
         mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(pathSave);
-            mediaPlayer.prepare();
+        if (playButton.getText().toString().equals("Play")) {
+            recordButton.setEnabled(false);
+
+            try {
+                mediaPlayer.setDataSource(pathSave);
+                mediaPlayer.prepare();
 
 
-        } catch(IOException e){
-            e.printStackTrace();
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+
+            mediaPlayer.start();
+            playButton.setText("Stop");
+            Toast.makeText(ProjectEditor.this, "Playing", Toast.LENGTH_SHORT).show();
+        }
+        else if (playButton.getText().toString().equals("Stop"))
+        {
+            mediaPlayer.stop();
+            recordButton.setEnabled(true);
         }
 
-        mediaPlayer.start();
-        Toast.makeText(ProjectEditor.this, "Playing", Toast.LENGTH_SHORT).show();
-        System.out.println(mediaPlayer.getDuration());
+
+
+        //System.out.println(mediaPlayer.getDuration());
         /*This code is incredibly laggy, but does let us determine when the recording ends.
         (while(mediaPlayer.isPlaying())
         {
@@ -70,11 +82,6 @@ public class ProjectEditor extends AppCompatActivity {
         }
         */
 
-    }
-
-    public void stopFunction(View view)
-    {
-        System.out.println("Stopping Audio...");
     }
 
     public void recordFunction(View view)
