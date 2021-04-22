@@ -24,6 +24,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.annotations.Nullable;
 
 import org.w3c.dom.Text;
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     //FireBase instance variable
     private FirebaseAuth mFirebaseAuth;
     public static final String ANONYMOUS = "anonymous";
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("users");
 
     private SharedPreferences mSharedPreferences;
     private GoogleSignInClient mSignInClient;
@@ -131,6 +135,9 @@ public class MainActivity extends AppCompatActivity {
                         String task = String.valueOf(taskEditText.getText());
                         Intent intent = new Intent(MainActivity.this, ProjectEditor.class);
                         String message = taskEditText.getText().toString();
+                        myRef.child(mFirebaseAuth.getCurrentUser().getUid())
+                                .child("projects").child(message).child("paths").child("one").setValue("");
+
                         intent.putExtra(EXTRA_MESSAGE, message);
                         startActivityForResult(intent, TEXT_REQUEST);
                     }
