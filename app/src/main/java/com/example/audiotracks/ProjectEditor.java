@@ -56,6 +56,7 @@ public class ProjectEditor extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -241,28 +242,16 @@ public class ProjectEditor extends AppCompatActivity {
         storageReference.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Log.d("success", "success from audio update");
+
+               myRef.child(mFirebaseAuth.getCurrentUser().getUid())
+                       .child("projects")
+                       .child(projectTitle)
+                       .child("paths")
+                       .child(String.valueOf(currentTrack))
+                       .setValue(storageReference.getDownloadUrl());
+
             }
         });
-                    /*
-
-                    uploadTask.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            System.out.println("fail");
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                            // ...
-                            mProgress.dismiss();
-                        }
-                    });
-
-
-                     */
 
     }
 
