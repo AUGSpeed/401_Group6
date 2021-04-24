@@ -109,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                     else{
                                         System.out.println("hello");
+                                        for(DataSnapshot child : task.getResult().getChildren()){
+                                            System.out.println(child);
+                                        }
                                         Log.d("firebase", String.valueOf(task.getResult().getValue()));
                                     }
                                 }
