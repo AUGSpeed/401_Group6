@@ -63,8 +63,6 @@ public class ProjectEditor extends AppCompatActivity {
             try {
                 mediaPlayer.setDataSource(pathLoad);
                 mediaPlayer.prepare();
-
-
             } catch(IOException e){
                 e.printStackTrace();
             }
