@@ -102,6 +102,7 @@ public class ProjectEditor extends AppCompatActivity {
                 mediaPlayer.stop();
                 mediaPlayer.release();
             }
+            playButton.setText("Play");
         }
 
 
@@ -124,8 +125,8 @@ public class ProjectEditor extends AppCompatActivity {
         if(checkPermissionFromDevice()) {
             Button playButton = findViewById(R.id.play_button);
             Button recordButton = findViewById(R.id.record_button);
-            fileName = projectTitle + "_audio_record" +currentTrack + ".3gp";
-            setupMediaRecorder();
+            fileName = projectTitle + "_audio_record" + currentTrack + ".3gp";
+
             if (recordButton.getText().toString().equals("Record")) {
 
                 pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
