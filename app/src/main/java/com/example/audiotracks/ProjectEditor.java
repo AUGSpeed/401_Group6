@@ -53,7 +53,7 @@ public class ProjectEditor extends AppCompatActivity {
     FirebaseStorage storage =  FirebaseStorage.getInstance();
     StorageReference mStorage = FirebaseStorage.getInstance().getReference();
     private ProgressDialog mProgress;
-    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
 
 
 
@@ -239,19 +239,34 @@ public class ProjectEditor extends AppCompatActivity {
                 .child("Audio")
                 .child(fileName);
         Uri file = Uri.fromFile(new File(pathSave));
-        storageReference.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        storageReference.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                taskSnapshot.getMetadata().getReference().getDownloadUrl()
+                        .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                System.out.println("hello");
+                                myRef.child(mFirebaseAuth.getCurrentUser().getUid())
+                                        .child("projects")
+                                        .child(projectTitle)
+                                        .child("paths")
+                                        .child(String.valueOf(currentTrack))
+                                        .setValue(uri.toString());
 
-               myRef.child(mFirebaseAuth.getCurrentUser().getUid())
-                       .child("projects")
-                       .child(projectTitle)
-                       .child("paths")
-                       .child(String.valueOf(currentTrack))
-                       .setValue(storageReference.getDownloadUrl());
+                            }
+                        });
 
             }
-        });
+        })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("bad upload", "Image upload task was not successful.", e);
+                    }
+                });
+
 
     }
 
