@@ -6,12 +6,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +22,19 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import org.w3c.dom.Text;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -30,7 +46,14 @@ public class ProjectEditor extends AppCompatActivity {
     final int REQUEST_PERMISSION_CODE = 1236;
     int currentTrack=1;
     String projectTitle="";
+    String fileName = "";
 
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("users");
+    FirebaseStorage storage =  FirebaseStorage.getInstance();
+    StorageReference mStorage = FirebaseStorage.getInstance().getReference();
+    private ProgressDialog mProgress;
+    private FirebaseAuth mFirebaseAuth;
 
 
     @Override
@@ -45,6 +68,7 @@ public class ProjectEditor extends AppCompatActivity {
         Button track1 = findViewById(R.id.track1);
         track1.setEnabled(false);
         projectTitle=message;
+        mProgress = new ProgressDialog(this);
     }
 
     public void playFunction(View view)
@@ -100,6 +124,8 @@ public class ProjectEditor extends AppCompatActivity {
         if(checkPermissionFromDevice()) {
             Button playButton = findViewById(R.id.play_button);
             Button recordButton = findViewById(R.id.record_button);
+            fileName = projectTitle + "_audio_record" +currentTrack + ".3gp";
+            setupMediaRecorder();
             if (recordButton.getText().toString().equals("Record")) {
 
                 pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
@@ -121,6 +147,8 @@ public class ProjectEditor extends AppCompatActivity {
                     mediaRecorder.stop();
                     mediaRecorder.release();
                     mediaRecorder = null;
+                    saveAudio();
+
                 } catch (IllegalStateException ise) {
                     ise.printStackTrace();
                 }
@@ -202,6 +230,40 @@ public class ProjectEditor extends AppCompatActivity {
         return write_external_storage_result == PackageManager.PERMISSION_GRANTED &&
                 record_audio_result == PackageManager.PERMISSION_GRANTED;
     }
+    private void saveAudio(){
+        Log.d("before storing", "before storing");
+
+        StorageReference storageReference = mStorage
+                .child("Audio")
+                .child(fileName);
+        Uri file = Uri.fromFile(new File(pathSave));
+        storageReference.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.d("success", "success from audio update");
+            }
+        });
+                    /*
+
+                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            System.out.println("fail");
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                            // ...
+                            mProgress.dismiss();
+                        }
+                    });
+
+
+                     */
+
+    }
 
     public void saveFunction()
     {
@@ -222,6 +284,7 @@ public class ProjectEditor extends AppCompatActivity {
     {
         System.out.println("Deleting...");
     }
+
 
     public void selectTrack1(View view) {
         Button track1 = findViewById(R.id.track1);
