@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, ProjectEditor.class);
                         String message = taskEditText.getText().toString();
                         myRef.child(mFirebaseAuth.getCurrentUser().getUid())
-                                .child("projects").child(message).child("paths").child("one").setValue("");
+                                .child("projects").child(message).child("paths").child("1").setValue("");
 
                         intent.putExtra(EXTRA_MESSAGE, message);
                         startActivityForResult(intent, TEXT_REQUEST);
