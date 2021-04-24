@@ -1,5 +1,6 @@
 package com.example.audiotracks;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +24,8 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -96,7 +100,19 @@ public class MainActivity extends AppCompatActivity {
                             Intent intent = new Intent(MainActivity.this, ProjectEditor.class);
                             String message = ed.getText().toString();
                             myRef.child(mFirebaseAuth.getCurrentUser().getUid())
-                                    .child("projects").child(message).child("paths").child("1").setValue("");
+                                    .child("projects").child(message).child("paths").get()
+                            .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    if(!task.isSuccessful()){
+                                        Log.e("firebase", "error getting data", task.getException());
+                                    }
+                                    else{
+                                        System.out.println("hello");
+                                        Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                                    }
+                                }
+                            });
 
                             intent.putExtra(EXTRA_MESSAGE, message);
                             startActivityForResult(intent, TEXT_REQUEST);
