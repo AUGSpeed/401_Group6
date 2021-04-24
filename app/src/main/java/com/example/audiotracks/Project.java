@@ -2,12 +2,11 @@ package com.example.audiotracks;
 
 public class Project {
     String name = "";
-    Track tracks[] = {};
-    Integer index = 0;
+    String paths[] = {};
 
-    public void addTrack(Track track)
+    /*public void addTrack(Track track)
     {
-        tracks[index] = track;
+        paths[index] = track;
         index++;
     }
 
@@ -16,7 +15,7 @@ public class Project {
         if (i == index - 1)
         {
             //We are at the top of the array, simply set the top to null and lower index.
-            tracks[i] = null;
+            paths[i] = null;
             index--;
         }
         else if ( i < index - 1)
@@ -24,10 +23,10 @@ public class Project {
             //Everything above needs to move down
             for (int j = i; j < index; j++)
             {
-                tracks[j] = tracks[j+1];
+                paths[j] = paths[j+1];
             }
             //The top one can now disappear, since it is now a copy of the one below it
-            tracks[index - 1] = null;
+            paths[index - 1] = null;
             index--;
         }
         else if ( i > index - 1)
@@ -35,9 +34,20 @@ public class Project {
             //Don't do anything, we cannot remove this track, since it does not exist.
         }
     }
-
+    */
     public void setName(String newName)
     {
         name = newName;
+    }
+    public String getName() {
+        return name;
+    }
+
+    public void setPaths(String path[]){
+        paths = path;
+    }
+
+    public String[] getPaths(){
+        return paths;
     }
 }
