@@ -22,9 +22,12 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -70,6 +73,64 @@ public class ProjectEditor extends AppCompatActivity {
         track1.setEnabled(false);
         projectTitle=message;
         mProgress = new ProgressDialog(this);
+        Boolean tracksPresent[] = {null, null, null};
+        for (int i = 1; i < 4; i++)
+        {
+            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
+                    + projectTitle + "_audio_record" + currentTrack + ".3gp";
+            System.out.println(pathLoad);
+            File file = new File(pathLoad);
+            tracksPresent[i-1] = file.exists();
+        }
+
+
+
+        myRef.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("projects").child(message).child("paths").get()
+                .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if(!task.isSuccessful()){
+                            Log.e("firebase", "error getting data", task.getException());
+                        }
+                        else{
+                            System.out.println("hello");
+                            for(DataSnapshot child : task.getResult().getChildren()){
+
+                                for (int i = 1; i <= 3; i++) {
+                                    String trackName = projectTitle + "_audio_record" + i + ".3gp";
+                                    String pathName = child.getValue().toString();
+                                    if (pathName.contains(trackName) && tracksPresent[i-1]) {
+                                        //File exists locally and in database, we don't need to do anything.
+                                        System.out.println("Yeah, This is in database and in local storage. Current track testing: " + i);
+                                    } else if (pathName.contains(trackName) && !tracksPresent[i-1]) {
+                                        //File Exists in the database, but not on the user's storage, we need to download the file.
+
+
+
+
+
+                                        //Koshiro, put the Downloading stuff here, the file that needs to be downloaded can be found with child.getValue(), and the name it needs to have locally is trackName.
+                                        System.out.println("In database, but not storage Current track testing: " + i);
+                                    } else if (!pathName.contains(trackName) && !tracksPresent[i-1]) {
+                                        //File doesn't exist anywhere, so we don't need to do anythji
+                                        System.out.println("Doesn't exist anywhere. Current track testing: " + i);
+                                    }
+                                }
+
+
+                            }
+                            Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                        }
+                    }
+                });
+    }
+
+    public void checkExists(String pathLoad) {
+        File file = new File(pathLoad);
+        if (file.exists()){
+            System.out.println("This File exists on the drive.");
+        }
     }
 
     public void playFunction(View view)
@@ -84,6 +145,8 @@ public class ProjectEditor extends AppCompatActivity {
             recordButton.setEnabled(false);
             String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
                     + projectTitle + "_audio_record" + currentTrack + ".3gp";
+            checkExists(pathLoad);
+
 
             try {
                 mediaPlayer.setDataSource(pathLoad);

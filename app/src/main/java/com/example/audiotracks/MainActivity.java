@@ -99,23 +99,6 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             Intent intent = new Intent(MainActivity.this, ProjectEditor.class);
                             String message = ed.getText().toString();
-                            myRef.child(mFirebaseAuth.getCurrentUser().getUid())
-                                    .child("projects").child(message).child("paths").get()
-                            .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                    if(!task.isSuccessful()){
-                                        Log.e("firebase", "error getting data", task.getException());
-                                    }
-                                    else{
-                                        System.out.println("hello");
-                                        for(DataSnapshot child : task.getResult().getChildren()){
-                                            System.out.println(child);
-                                        }
-                                        Log.d("firebase", String.valueOf(task.getResult().getValue()));
-                                    }
-                                }
-                            });
 
                             intent.putExtra(EXTRA_MESSAGE, message);
                             startActivityForResult(intent, TEXT_REQUEST);
