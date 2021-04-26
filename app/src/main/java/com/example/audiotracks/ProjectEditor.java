@@ -6,7 +6,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -105,10 +107,14 @@ public class ProjectEditor extends AppCompatActivity {
                                         System.out.println("Yeah, This is in database and in local storage. Current track testing: " + i);
                                     } else if (pathName.contains(trackName) && !tracksPresent[i-1]) {
                                         //File Exists in the database, but not on the user's storage, we need to download the file.
-
-
-
-
+                                        DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                                        Uri uri = Uri.parse(child.getValue().toString());
+                                        DownloadManager.Request request = new DownloadManager.Request(uri);
+                                        request.setTitle(trackName);
+                                        request.setDescription("Downloading");
+                                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                                                projectTitle + "_audio_record" + currentTrack + ".3gp");
+                                        downloadManager.enqueue(request);
 
                                         //Koshiro, put the Downloading stuff here, the file that needs to be downloaded can be found with child.getValue(), and the name it needs to have locally is trackName.
                                         System.out.println("In database, but not storage Current track testing: " + i);
