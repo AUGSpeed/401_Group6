@@ -3,10 +3,4 @@
     <item
         android:id = "@+id/proj"
         android:title = "New Project" />
-    <item
-        android:id = "@+id/sync"
-        android:title = "Sync From Cloud"/>
-    <item
-        android:id = "@+id/login"
-        android:title = "Login"/>
 </menu>

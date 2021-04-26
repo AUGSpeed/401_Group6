@@ -1,6 +1,7 @@
 package com.example.audiotracks;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -9,6 +10,7 @@ import android.Manifest;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -20,6 +22,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +44,7 @@ import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Ref;
 import java.util.UUID;
 
 public class ProjectEditor extends AppCompatActivity {
@@ -75,61 +79,8 @@ public class ProjectEditor extends AppCompatActivity {
         track1.setEnabled(false);
         projectTitle=message;
         mProgress = new ProgressDialog(this);
-        Boolean tracksPresent[] = {null, null, null};
-        for (int i = 1; i < 4; i++)
-        {
-            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
-                    + projectTitle + "_audio_record" + currentTrack + ".3gp";
-            System.out.println(pathLoad);
-            File file = new File(pathLoad);
-            tracksPresent[i-1] = file.exists();
-        }
-
-
-
-        myRef.child(mFirebaseAuth.getCurrentUser().getUid())
-                .child("projects").child(message).child("paths").get()
-                .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DataSnapshot> task) {
-                        if(!task.isSuccessful()){
-                            Log.e("firebase", "error getting data", task.getException());
-                        }
-                        else{
-                            System.out.println("hello");
-                            for(DataSnapshot child : task.getResult().getChildren()){
-
-                                for (int i = 1; i <= 3; i++) {
-                                    String trackName = projectTitle + "_audio_record" + i + ".3gp";
-                                    String pathName = child.getValue().toString();
-                                    if (pathName.contains(trackName) && tracksPresent[i-1]) {
-                                        //File exists locally and in database, we don't need to do anything.
-                                        System.out.println("Yeah, This is in database and in local storage. Current track testing: " + i);
-                                    } else if (pathName.contains(trackName) && !tracksPresent[i-1]) {
-                                        //File Exists in the database, but not on the user's storage, we need to download the file.
-                                        DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                                        Uri uri = Uri.parse(child.getValue().toString());
-                                        DownloadManager.Request request = new DownloadManager.Request(uri);
-                                        request.setTitle(trackName);
-                                        request.setDescription("Downloading");
-                                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-                                                projectTitle + "_audio_record" + currentTrack + ".3gp");
-                                        downloadManager.enqueue(request);
-
-                                        //Koshiro, put the Downloading stuff here, the file that needs to be downloaded can be found with child.getValue(), and the name it needs to have locally is trackName.
-                                        System.out.println("In database, but not storage Current track testing: " + i);
-                                    } else if (!pathName.contains(trackName) && !tracksPresent[i-1]) {
-                                        //File doesn't exist anywhere, so we don't need to do anythji
-                                        System.out.println("Doesn't exist anywhere. Current track testing: " + i);
-                                    }
-                                }
-
-
-                            }
-                            Log.d("firebase", String.valueOf(task.getResult().getValue()));
-                        }
-                    }
-                });
+        Context context = this;
+        downloadFunction();
     }
 
     public void checkExists(String pathLoad) {
@@ -149,7 +100,7 @@ public class ProjectEditor extends AppCompatActivity {
 
         if (playButton.getText().toString().equals("Play")) {
             recordButton.setEnabled(false);
-            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
+            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
                     + projectTitle + "_audio_record" + currentTrack + ".3gp";
             checkExists(pathLoad);
 
@@ -199,7 +150,7 @@ public class ProjectEditor extends AppCompatActivity {
 
             if (recordButton.getText().toString().equals("Record")) {
 
-                pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
+                pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
                         + projectTitle + "_audio_record" + currentTrack + ".3gp";
                 setupMediaRecorder();
                 try {
@@ -351,12 +302,19 @@ public class ProjectEditor extends AppCompatActivity {
 
     public void renameFunction()
     {
-        System.out.println("Renaming...");
+
     }
 
     public void deleteFunction()
     {
-        System.out.println("Deleting...");
+        myRef.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("projects")
+                .child(projectTitle)
+                .removeValue();
+
+        Intent intent = new Intent(ProjectEditor.this, MainActivity.class);
+        int code = 1;
+        startActivityForResult(intent, code);
     }
 
 
@@ -386,5 +344,64 @@ public class ProjectEditor extends AppCompatActivity {
         track2.setEnabled(true);
         track3.setEnabled(false);
         currentTrack=3;
+    }
+
+    public void downloadFunction() {
+        Boolean tracksPresent[] = {null, null, null};
+        for (int i = 1; i < 4; i++)
+        {
+            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/Download/"
+                    + projectTitle + "_audio_record" + currentTrack + ".3gp";
+            System.out.println(pathLoad);
+            File file = new File(pathLoad);
+            tracksPresent[i-1] = file.exists();
+        }
+
+
+
+        myRef.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("projects").child(projectTitle).child("paths").get()
+                .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if(!task.isSuccessful()){
+                            Log.e("firebase", "error getting data", task.getException());
+                        }
+                        else{
+                            System.out.println("hello");
+                            for(DataSnapshot child : task.getResult().getChildren()){
+
+                                for (int i = 1; i <= 3; i++) {
+                                    String trackName = projectTitle + "_audio_record" + i + ".3gp";
+                                    String pathName = child.getValue().toString();
+                                    if (pathName.contains(trackName) && tracksPresent[i-1]) {
+                                        //File exists locally and in database, we don't need to do anything.
+                                        System.out.println("Yeah, This is in database and in local storage. Current track testing: " + i);
+                                    } else if (pathName.contains(trackName) && !tracksPresent[i-1]) {
+                                        //File Exists in the database, but not on the user's storage, we need to download the file.
+                                        DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                                        Uri uri = Uri.parse(child.getValue().toString());
+                                        DownloadManager.Request request = new DownloadManager.Request(uri);
+                                        request.setTitle(trackName);
+                                        request.setDescription("Downloading");
+                                        System.out.println(Environment.DIRECTORY_DOWNLOADS);
+                                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                                                projectTitle + "_audio_record" + i + ".3gp");
+                                        downloadManager.enqueue(request);
+
+                                        //Koshiro, put the Downloading stuff here, the file that needs to be downloaded can be found with child.getValue(), and the name it needs to have locally is trackName.
+                                        System.out.println("In database, but not storage Current track testing: " + i);
+                                    } else if (!pathName.contains(trackName) && !tracksPresent[i-1]) {
+                                        //File doesn't exist anywhere, so we don't need to do anythji
+                                        System.out.println("Doesn't exist anywhere. Current track testing: " + i);
+                                    }
+                                }
+
+
+                            }
+                            Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                        }
+                    }
+                });
     }
 }

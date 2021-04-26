@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                     .requestEmail()
                     .build();
             mSignInClient = GoogleSignIn.getClient(this, gso);
-            Button loginButton = findViewById(R.id.login);
         }
         myRef.child(mFirebaseAuth.getCurrentUser().getUid()).child("projects").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -126,14 +125,6 @@ public class MainActivity extends AppCompatActivity {
                     newProject();
                     return true;
                 }
-                else if (item.getTitle().toString().equals("Sync From Cloud")) {
-                    cloudSync();
-                    return true;
-                }
-                else if (item.getTitle().toString().equals("Login")) {
-                   // cloudLogin();
-                    return true;
-                }
                 else {
                     Toast.makeText(MainActivity.this,"didn't work", Toast.LENGTH_SHORT).show();
                     return true;
@@ -147,16 +138,6 @@ public class MainActivity extends AppCompatActivity {
     private void newProject() {
         Toast.makeText(MainActivity.this,"new project", Toast.LENGTH_SHORT).show();
         showAddProjectDialog(MainActivity.this);
-    }
-
-    //This will execute when the user presses Cloud Sync in the drop down
-    private void cloudSync() {
-        Toast.makeText(MainActivity.this,"cloud sync", Toast.LENGTH_SHORT).show();
-    }
-
-    //This will execute when the user presses Login in the drop down
-    private void cloudLogin() {
-        Toast.makeText(MainActivity.this,"cloud login", Toast.LENGTH_SHORT).show();
     }
 
     private void showAddProjectDialog(Context c) {
