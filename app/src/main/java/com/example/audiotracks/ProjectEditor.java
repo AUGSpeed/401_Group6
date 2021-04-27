@@ -57,7 +57,7 @@ public class ProjectEditor extends AppCompatActivity {
     String pathSave="";
     final int REQUEST_PERMISSION_CODE = 1236;
     int currentTrack=1;
-    String projectTitle="";
+    Project currentProject = new Project();
     String fileName = "";
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -80,7 +80,7 @@ public class ProjectEditor extends AppCompatActivity {
         requestPermission();
         Button track1 = findViewById(R.id.track1);
         track1.setEnabled(false);
-        projectTitle=message;
+        currentProject.setName(message);
         mProgress = new ProgressDialog(this);
         Context context = this;
         downloadFunction();
@@ -105,8 +105,7 @@ public class ProjectEditor extends AppCompatActivity {
         }
         if (playButton.getText().toString().equals("Play")) {
             recordButton.setEnabled(false);
-            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
-                    + projectTitle + "_audio_record" + currentTrack + ".3gp";
+            String pathLoad = currentProject.getPath(currentTrack - 1);
             checkExists(pathLoad);
 
 
@@ -165,8 +164,7 @@ public class ProjectEditor extends AppCompatActivity {
         }
         if (playAllButton.getText().toString().equals("Play All")) {
             recordButton.setEnabled(false);
-            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
-                    + projectTitle + "_audio_record" + 1 + ".3gp";
+            String pathLoad = currentProject.getPath(0);
             if(checkExists(pathLoad)) {
                 try {
                     mediaPlayer1.setDataSource(pathLoad);
@@ -176,8 +174,7 @@ public class ProjectEditor extends AppCompatActivity {
                 }
                 atleastOne=true;
             }
-            pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
-                    + projectTitle + "_audio_record" + 2 + ".3gp";
+            pathLoad = currentProject.getPath(1);
             if(checkExists(pathLoad)) {
                 try {
                     mediaPlayer2.setDataSource(pathLoad);
@@ -187,8 +184,7 @@ public class ProjectEditor extends AppCompatActivity {
                 }
                 atleastOne=true;
             }
-            pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
-                    + projectTitle + "_audio_record" + 3 + ".3gp";
+            pathLoad = currentProject.getPath(2);
             if(checkExists(pathLoad)) {
                 try {
                     mediaPlayer3.setDataSource(pathLoad);
@@ -237,12 +233,12 @@ public class ProjectEditor extends AppCompatActivity {
         if(checkPermissionFromDevice()) {
             Button playButton = findViewById(R.id.play_button);
             Button recordButton = findViewById(R.id.record_button);
-            fileName = projectTitle + "_audio_record" + currentTrack + ".3gp";
+            fileName = currentProject.getName() + "_audio_record" + currentTrack + ".3gp";
 
             if (recordButton.getText().toString().equals("Record")) {
 
-                pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
-                        + projectTitle + "_audio_record" + currentTrack + ".3gp";
+                currentProject.addPath(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
+                        + currentProject.getName() + "_audio_record" + currentTrack + ".3gp", currentTrack - 1);
                 setupMediaRecorder();
                 try {
                     mediaRecorder.prepare();
@@ -313,7 +309,7 @@ public class ProjectEditor extends AppCompatActivity {
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-        mediaRecorder.setOutputFile(pathSave);
+        mediaRecorder.setOutputFile(currentProject.getPath(currentTrack - 1));
     }
 
     private void requestPermission(){
@@ -361,7 +357,7 @@ public class ProjectEditor extends AppCompatActivity {
                                 System.out.println("hello");
                                 myRef.child(mFirebaseAuth.getCurrentUser().getUid())
                                         .child("projects")
-                                        .child(projectTitle)
+                                        .child(currentProject.getName())
                                         .child("paths")
                                         .child(String.valueOf(currentTrack))
                                         .setValue(uri.toString());
@@ -400,7 +396,7 @@ public class ProjectEditor extends AppCompatActivity {
     {
         myRef.child(mFirebaseAuth.getCurrentUser().getUid())
                 .child("projects")
-                .child(projectTitle)
+                .child(currentProject.getName())
                 .removeValue();
 
         Intent intent = new Intent(ProjectEditor.this, MainActivity.class);
@@ -441,17 +437,21 @@ public class ProjectEditor extends AppCompatActivity {
         Boolean tracksPresent[] = {null, null, null};
         for (int i = 1; i < 4; i++)
         {
-            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/Download/"
-                    + projectTitle + "_audio_record" + currentTrack + ".3gp";
+            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
+                    + currentProject.getName() + "_audio_record" + currentTrack + ".3gp";
             System.out.println(pathLoad);
             File file = new File(pathLoad);
+            if (file.exists())
+            {
+                currentProject.addPath(pathLoad, i-1);
+            }
             tracksPresent[i-1] = file.exists();
         }
 
 
 
         myRef.child(mFirebaseAuth.getCurrentUser().getUid())
-                .child("projects").child(projectTitle).child("paths").get()
+                .child("projects").child(currentProject.getName()).child("paths").get()
                 .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -463,7 +463,7 @@ public class ProjectEditor extends AppCompatActivity {
                             for(DataSnapshot child : task.getResult().getChildren()){
 
                                 for (int i = 1; i <= 3; i++) {
-                                    String trackName = projectTitle + "_audio_record" + i + ".3gp";
+                                    String trackName = currentProject.getName() + "_audio_record" + i + ".3gp";
                                     String pathName = child.getValue().toString();
                                     if (pathName.contains(trackName) && tracksPresent[i-1]) {
                                         //File exists locally and in database, we don't need to do anything.
@@ -477,7 +477,7 @@ public class ProjectEditor extends AppCompatActivity {
                                         request.setDescription("Downloading");
                                         System.out.println(Environment.DIRECTORY_DOWNLOADS);
                                         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-                                                projectTitle + "_audio_record" + i + ".3gp");
+                                                currentProject.getName() + "_audio_record" + i + ".3gp");
                                         downloadManager.enqueue(request);
 
                                         //Koshiro, put the Downloading stuff here, the file that needs to be downloaded can be found with child.getValue(), and the name it needs to have locally is trackName.
