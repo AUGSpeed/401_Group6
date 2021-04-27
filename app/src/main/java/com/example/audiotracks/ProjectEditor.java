@@ -51,6 +51,9 @@ public class ProjectEditor extends AppCompatActivity {
     Button popupButton;
     MediaRecorder mediaRecorder;
     MediaPlayer mediaPlayer;
+    MediaPlayer mediaPlayer1;
+    MediaPlayer mediaPlayer2;
+    MediaPlayer mediaPlayer3;
     String pathSave="";
     final int REQUEST_PERMISSION_CODE = 1236;
     int currentTrack=1;
@@ -83,11 +86,13 @@ public class ProjectEditor extends AppCompatActivity {
         downloadFunction();
     }
 
-    public void checkExists(String pathLoad) {
+    public boolean checkExists(String pathLoad) {
         File file = new File(pathLoad);
         if (file.exists()){
             System.out.println("This File exists on the drive.");
+            return true;
         }
+        return false;
     }
 
     public void playFunction(View view)
@@ -95,9 +100,9 @@ public class ProjectEditor extends AppCompatActivity {
         Button playButton = findViewById(R.id.play_button);
         Button recordButton = findViewById(R.id.record_button);
         recordButton.setEnabled(false);
-        mediaPlayer = new MediaPlayer();
-
-
+        if(mediaPlayer==null) {
+            mediaPlayer = new MediaPlayer();
+        }
         if (playButton.getText().toString().equals("Play")) {
             recordButton.setEnabled(false);
             String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
@@ -122,6 +127,7 @@ public class ProjectEditor extends AppCompatActivity {
             if(mediaPlayer!=null){
                 mediaPlayer.stop();
                 mediaPlayer.release();
+                mediaPlayer=null;
             }
             playButton.setText("Play");
         }
@@ -139,6 +145,91 @@ public class ProjectEditor extends AppCompatActivity {
         }
         */
 
+    }
+
+    public void playAll(View view) {
+        Button playButton = findViewById(R.id.play_button);
+        Button playAllButton = findViewById(R.id.playAllButton);
+        Button recordButton = findViewById(R.id.record_button);
+        Boolean atleastOne=false;
+        recordButton.setEnabled(false);
+        playButton.setEnabled(false);
+        if(mediaPlayer1==null) {
+            mediaPlayer1 = new MediaPlayer();
+        }
+        if(mediaPlayer2==null) {
+            mediaPlayer2 = new MediaPlayer();
+        }
+        if(mediaPlayer3==null) {
+            mediaPlayer3 = new MediaPlayer();
+        }
+        if (playAllButton.getText().toString().equals("Play All")) {
+            recordButton.setEnabled(false);
+            String pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
+                    + projectTitle + "_audio_record" + 1 + ".3gp";
+            if(checkExists(pathLoad)) {
+                try {
+                    mediaPlayer1.setDataSource(pathLoad);
+                    mediaPlayer1.prepare();
+                } catch(IOException e){
+                    e.printStackTrace();
+                }
+                atleastOne=true;
+            }
+            pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
+                    + projectTitle + "_audio_record" + 2 + ".3gp";
+            if(checkExists(pathLoad)) {
+                try {
+                    mediaPlayer2.setDataSource(pathLoad);
+                    mediaPlayer2.prepare();
+                } catch(IOException e){
+                    e.printStackTrace();
+                }
+                atleastOne=true;
+            }
+            pathLoad = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
+                    + projectTitle + "_audio_record" + 3 + ".3gp";
+            if(checkExists(pathLoad)) {
+                try {
+                    mediaPlayer3.setDataSource(pathLoad);
+                    mediaPlayer3.prepare();
+                } catch(IOException e){
+                    e.printStackTrace();
+                }
+                atleastOne=true;
+            }
+            if(atleastOne) {
+                mediaPlayer1.start();
+                mediaPlayer2.start();
+                mediaPlayer3.start();
+                playAllButton.setText("Stop");
+                Toast.makeText(ProjectEditor.this, "Playing", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(ProjectEditor.this, "Nothing to play!", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (playAllButton.getText().toString().equals("Stop"))
+        {
+            recordButton.setEnabled(true);
+            playButton.setEnabled(true);
+            if(mediaPlayer1!=null){
+                mediaPlayer1.stop();
+                mediaPlayer1.release();
+                mediaPlayer1=null;
+            }
+            if(mediaPlayer2!=null){
+                mediaPlayer2.stop();
+                mediaPlayer2.release();
+                mediaPlayer2=null;
+            }
+            if(mediaPlayer3!=null){
+                mediaPlayer3.stop();
+                mediaPlayer3.release();
+                mediaPlayer3=null;
+            }
+            playAllButton.setText("Play All");
+        }
     }
 
     public void recordFunction(View view)
@@ -404,4 +495,6 @@ public class ProjectEditor extends AppCompatActivity {
                     }
                 });
     }
+
+
 }
