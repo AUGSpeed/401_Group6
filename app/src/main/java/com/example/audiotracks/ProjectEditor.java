@@ -87,10 +87,12 @@ public class ProjectEditor extends AppCompatActivity {
     }
 
     public boolean checkExists(String pathLoad) {
-        File file = new File(pathLoad);
-        if (file.exists()){
-            System.out.println("This File exists on the drive.");
-            return true;
+        if (pathLoad != null) {
+            File file = new File(pathLoad);
+            if (file.exists()) {
+                System.out.println("This File exists on the drive.");
+                return true;
+            }
         }
         return false;
     }
@@ -153,18 +155,18 @@ public class ProjectEditor extends AppCompatActivity {
         Boolean atleastOne=false;
         recordButton.setEnabled(false);
         playButton.setEnabled(false);
-        if(mediaPlayer1==null) {
+        if(mediaPlayer1 == null) {
             mediaPlayer1 = new MediaPlayer();
         }
-        if(mediaPlayer2==null) {
+        if(mediaPlayer2 == null) {
             mediaPlayer2 = new MediaPlayer();
         }
-        if(mediaPlayer3==null) {
+        if(mediaPlayer3 == null) {
             mediaPlayer3 = new MediaPlayer();
         }
         if (playAllButton.getText().toString().equals("Play All")) {
             recordButton.setEnabled(false);
-            String pathLoad = currentProject.getPath(0);
+            String pathLoad = currentProject.paths[0];
             if(checkExists(pathLoad)) {
                 try {
                     mediaPlayer1.setDataSource(pathLoad);
@@ -174,7 +176,7 @@ public class ProjectEditor extends AppCompatActivity {
                 }
                 atleastOne=true;
             }
-            pathLoad = currentProject.getPath(1);
+            pathLoad = currentProject.paths[1];
             if(checkExists(pathLoad)) {
                 try {
                     mediaPlayer2.setDataSource(pathLoad);
@@ -184,7 +186,7 @@ public class ProjectEditor extends AppCompatActivity {
                 }
                 atleastOne=true;
             }
-            pathLoad = currentProject.getPath(2);
+            pathLoad = currentProject.paths[2];
             if(checkExists(pathLoad)) {
                 try {
                     mediaPlayer3.setDataSource(pathLoad);
