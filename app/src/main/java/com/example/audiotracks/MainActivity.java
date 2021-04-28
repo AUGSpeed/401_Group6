@@ -37,6 +37,13 @@ import com.google.firebase.database.annotations.Nullable;
 
 import org.w3c.dom.Text;
 
+/**
+ * This is our main function
+ * First it runs onCreate which checks if the user is logged in
+ * If the user is logged in then it takes the user to our main menu.
+ * If the user is not logged in then they are taken to our sign in page engined through google.
+ * @author ehabh
+ */
 public class MainActivity extends AppCompatActivity {
     Button popupButton;
 
@@ -52,6 +59,15 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences mSharedPreferences;
     private GoogleSignInClient mSignInClient;
 
+
+    /**
+     * onCreate checks if the user is signed in and if true, sets the content pane for our application
+     * displaying a user interface for our main menu which consists of
+     * a button (currently labelled as "button") which upon clicking creates a popup menu
+     * with an option to create a new project, as well as displaying a list of the users current projects ( if any exist )
+     *
+     * if the user isn't signed in then it loads a signin page engined by google
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +100,10 @@ public class MainActivity extends AppCompatActivity {
             mSignInClient = GoogleSignIn.getClient(this, gso);
         }
         myRef.child(mFirebaseAuth.getCurrentUser().getUid()).child("projects").addListenerForSingleValueEvent(new ValueEventListener() {
+            /**
+             * onDataChange !!!!!INSERT DESCRIPTION HERE !!!!!!!!!!
+             * @param dataSnapshot !!!!!! INSERT DESCRIPTION HERE !!!!!!
+             */
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -107,6 +127,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            /**
+             *  onCancelled !!!!!!! INSERT DESCCRIPTION HERE !!!!!!!!
+             * @param databaseError !!!!!! INSERT DESCRIPTION HERE !!!!!
+             */
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
@@ -114,11 +138,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * popupMenuExample creates
+     * @param view
+     */
     public void popupMenuExample(View view) {
         popupButton = findViewById(R.id.popup);
         PopupMenu p = new PopupMenu(MainActivity.this, popupButton);
         p.getMenuInflater().inflate(R.menu.main_popup_menu, p .getMenu());
         p.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            /**
+             *
+             * @param item
+             * @return
+             */
             public boolean onMenuItemClick(MenuItem item) {
                 //When an Item in the drop down is pressed, we need to know which one is pressed.
                 if (item.getTitle().toString().equals("New Project")) {
@@ -134,12 +167,18 @@ public class MainActivity extends AppCompatActivity {
         p.show();
     }
 
-    //This will execute when the user presses New Project in the drop down
+    /**
+     *  newProject is executed when the user presses New Project in the drop down menu
+     */
     private void newProject() {
         Toast.makeText(MainActivity.this,"new project", Toast.LENGTH_SHORT).show();
         showAddProjectDialog(MainActivity.this);
     }
 
+    /**
+     * showAddProjectDialog prompts the user to create a name for their project
+     * @param c context !!! INSERT DESCRIPTION HERE !!!!
+     */
     private void showAddProjectDialog(Context c) {
         final EditText taskEditText = new EditText(c);
         AlertDialog dialog = new AlertDialog.Builder(c)
@@ -147,6 +186,11 @@ public class MainActivity extends AppCompatActivity {
                 //.setMessage("What do you want to do next?")
                 .setView(taskEditText)
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    /**
+                     *  onClick tracks when the user clicks the text box to enter a name
+                     * @param dialog shows the message "Name your new Project:" inside of the text box for the user to input a name for their new project
+                     * @param which !!!! INSERT DESCRIPTION HERE !!!!
+                     */
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //This Variable holds the string the user just entered. We will pass it to the second screen, where the user can choose to save the project or not, putting it into the data structure we choose for storing these projects.
@@ -165,6 +209,9 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * getUserPhotoUrl() loads the user's profile picture from the google database
+     */
     @Nullable
     private String getUserPhotoUrl() {
         FirebaseUser user = mFirebaseAuth.getCurrentUser();
@@ -175,6 +222,10 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    /**
+     * getUserName() returns the user's name
+     * @return the  user's name
+     */
     private String getUserName() {
         FirebaseUser user = mFirebaseAuth.getCurrentUser();
         if (user != null) {

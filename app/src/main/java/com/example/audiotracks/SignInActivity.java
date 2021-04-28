@@ -23,6 +23,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+/**
+ * SignInActivity connects to the google database to have the user sign in through their google account
+ */
 public class SignInActivity extends AppCompatActivity{
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -34,6 +37,10 @@ public class SignInActivity extends AppCompatActivity{
     private FirebaseAuth mFirebaseAuth;
 
 
+    /**
+     * onCreate prompts the user to sign in to their google account
+     * @param savedInstanceState the user's current projects from last sign in !!!! PLEASE REVIEW !!!!
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +70,12 @@ public class SignInActivity extends AppCompatActivity{
 
     }
 
+    /**
+     *  onActivityResult allows the user access to the application if user was able to sign in
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -81,11 +94,19 @@ public class SignInActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     *
+     * @param acct
+     */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mFirebaseAuth.signInWithCredential(credential)
                 .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
+                    /***
+                     *
+                     * @param authResult
+                     */
                     @Override
                     public void onSuccess(AuthResult authResult) {
                         // If sign in succeeds the auth state listener will be notified and logic to
@@ -96,6 +117,10 @@ public class SignInActivity extends AppCompatActivity{
                     }
                 })
                 .addOnFailureListener(this, new OnFailureListener() {
+                    /**
+                     *
+                     * @param e
+                     */
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // If sign in fails, display a message to the user.
@@ -106,6 +131,9 @@ public class SignInActivity extends AppCompatActivity{
                 });
     }
 
+    /**
+     * signIn !!!! INSERT DESCRIPTION HERE !!!!
+     */
     private void signIn() {
         Intent signInIntent = mSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
