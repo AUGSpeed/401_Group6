@@ -1,3 +1,4 @@
+
 package com.example.audiotracks;
 
 import androidx.annotation.NonNull;
@@ -47,6 +48,11 @@ import java.io.IOException;
 import java.sql.Ref;
 import java.util.UUID;
 
+/**
+ *  The Project Editor function contains our audio manipulation tools
+ *  it creates buttons for user input that control the audio
+ *  to start recording, stop recording, play a single track or play all tracks
+ */
 public class ProjectEditor extends AppCompatActivity {
     Button popupButton;
     MediaRecorder mediaRecorder;
@@ -67,8 +73,10 @@ public class ProjectEditor extends AppCompatActivity {
     private ProgressDialog mProgress;
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
 
-
-
+    /**
+     * onCreate
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +94,11 @@ public class ProjectEditor extends AppCompatActivity {
         downloadFunction();
     }
 
+    /**
+     *  checkExists returns true if the file exists on the drive false if the file wasn't found
+     * @param pathLoad the location of the project
+     * @return whether or not the file exists on the drive
+     */
     public boolean checkExists(String pathLoad) {
         if (pathLoad != null) {
             File file = new File(pathLoad);
@@ -97,6 +110,10 @@ public class ProjectEditor extends AppCompatActivity {
         return false;
     }
 
+    /**
+     *  playFunction plays the selected audio track recorded by the user
+     * @param view !!!! INSERT DESCRIPTION HERE !!!!
+     */
     public void playFunction(View view)
     {
         Button playButton = findViewById(R.id.play_button);
@@ -148,6 +165,10 @@ public class ProjectEditor extends AppCompatActivity {
 
     }
 
+    /**
+     *  playAll plays all tracks recorded by the user on the current project
+     * @param view !!!! INSERT DESCRIPTION HERE !!!!
+     */
     public void playAll(View view) {
         Button playButton = findViewById(R.id.play_button);
         Button playAllButton = findViewById(R.id.playAllButton);
@@ -230,6 +251,10 @@ public class ProjectEditor extends AppCompatActivity {
         }
     }
 
+    /**
+     * recordFunction records on the selected track of the current project
+     * @param view !!!! INSERT DESCRIPTION HERE !!!!
+     */
     public void recordFunction(View view)
     {
         if(checkPermissionFromDevice()) {
@@ -274,6 +299,10 @@ public class ProjectEditor extends AppCompatActivity {
         }
     }
 
+    /**
+     * popupMenu creates the popup menu with options to save, export, rename, or delete a project
+     * @param view !!!! INSERT DESCRIPTION HERE !!!!!
+     */
     public void popupMenu(View view) {
         popupButton = findViewById(R.id.project_button);
         PopupMenu p = new PopupMenu(ProjectEditor.this, popupButton);
@@ -294,6 +323,9 @@ public class ProjectEditor extends AppCompatActivity {
         p.show();
     }
 
+    /**
+     * setupMediaRecorder initializes the microphone on the user's device
+     */
     private void setupMediaRecorder() {
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -302,6 +334,9 @@ public class ProjectEditor extends AppCompatActivity {
         mediaRecorder.setOutputFile(currentProject.getPath(currentTrack - 1));
     }
 
+    /**
+     * requestPermission requests the user's permission to access their microphone
+     */
     private void requestPermission(){
         ActivityCompat.requestPermissions(this, new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -309,6 +344,10 @@ public class ProjectEditor extends AppCompatActivity {
         },REQUEST_PERMISSION_CODE);
     }
 
+
+    /**
+     * onRequestPermissionsResult !!!! INSERT DESCRIPTION HERE !!!!!
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
@@ -323,12 +362,20 @@ public class ProjectEditor extends AppCompatActivity {
         }
     }
 
+    /**
+     * checkPermissionFromDevice checks if the user had previously consented to microphone access
+     * @return true if user has granted access
+     */
     private boolean checkPermissionFromDevice(){
         int write_external_storage_result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int record_audio_result = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
         return write_external_storage_result == PackageManager.PERMISSION_GRANTED &&
                 record_audio_result == PackageManager.PERMISSION_GRANTED;
     }
+
+    /**
+     * saveAudio saves the current track
+     */
     private void saveAudio(){
         Log.d("before storing", "before storing");
 
@@ -338,6 +385,10 @@ public class ProjectEditor extends AppCompatActivity {
         Uri file = Uri.fromFile(new File(currentProject.getPath(currentTrack - 1)));
         storageReference.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            /**'
+             * onSuccess closes the popup menu
+             * @param taskSnapshot
+             */
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 taskSnapshot.getMetadata().getReference().getDownloadUrl()
@@ -358,6 +409,10 @@ public class ProjectEditor extends AppCompatActivity {
             }
         })
                 .addOnFailureListener(this, new OnFailureListener() {
+                    /**
+                     *  onFaliure throws an exeption
+                     * @param e exception
+                     */
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w("bad upload", "Image upload task was not successful.", e);
@@ -367,6 +422,9 @@ public class ProjectEditor extends AppCompatActivity {
 
     }
 
+    /**
+     *  deleteFunction deletes the current project
+     */
     public void deleteFunction()
     {
         myRef.child(mFirebaseAuth.getCurrentUser().getUid())
@@ -380,6 +438,10 @@ public class ProjectEditor extends AppCompatActivity {
     }
 
 
+    /**
+     *  selectTrack1 selects the first track
+     * @param view
+     */
     public void selectTrack1(View view) {
         Button track1 = findViewById(R.id.track1);
         Button track2 = findViewById(R.id.track2);
@@ -389,6 +451,11 @@ public class ProjectEditor extends AppCompatActivity {
         track3.setEnabled(true);
         currentTrack=1;
     }
+
+    /**
+     * selectTrack 2 selects the second track
+     * @param view
+     */
     public void selectTrack2(View view) {
         Button track1 = findViewById(R.id.track1);
         Button track2 = findViewById(R.id.track2);
@@ -398,6 +465,11 @@ public class ProjectEditor extends AppCompatActivity {
         track3.setEnabled(true);
         currentTrack=2;
     }
+
+    /**
+     * select 3 selects the third track
+     * @param view
+     */
     public void selectTrack3(View view) {
         Button track1 = findViewById(R.id.track1);
         Button track2 = findViewById(R.id.track2);
@@ -408,6 +480,9 @@ public class ProjectEditor extends AppCompatActivity {
         currentTrack=3;
     }
 
+    /**
+     * downloadFunction downloads the project from the database onto local storage
+     */
     public void downloadFunction() {
         Boolean tracksPresent[] = {null, null, null};
         for (int i = 1; i < 4; i++)
@@ -422,8 +497,6 @@ public class ProjectEditor extends AppCompatActivity {
             }
             tracksPresent[i-1] = file.exists();
         }
-
-
 
         myRef.child(mFirebaseAuth.getCurrentUser().getUid())
                 .child("projects").child(currentProject.getName()).child("paths").get()
