@@ -279,19 +279,7 @@ public class ProjectEditor extends AppCompatActivity {
         p.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 //When an Item in the drop down is pressed, we need to know which one is pressed.
-                if (item.getTitle().toString().equals("Save")) {
-                    saveFunction();
-                    return true;
-                }
-                else if (item.getTitle().toString().equals("Export")) {
-                    exportFunction();
-                    return true;
-                }
-                else if (item.getTitle().toString().equals("Rename")) {
-                    renameFunction();
-                    return true;
-                }
-                else if (item.getTitle().toString().equals("Delete")) {
+                if (item.getTitle().toString().equals("Delete")) {
                     deleteFunction();
                     return true;
                 }
@@ -345,7 +333,7 @@ public class ProjectEditor extends AppCompatActivity {
         StorageReference storageReference = mStorage
                 .child("Audio")
                 .child(fileName);
-        Uri file = Uri.fromFile(new File(pathSave));
+        Uri file = Uri.fromFile(new File(currentProject.getPath(currentTrack - 1)));
         storageReference.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -374,21 +362,6 @@ public class ProjectEditor extends AppCompatActivity {
                     }
                 });
 
-
-    }
-
-    public void saveFunction()
-    {
-        System.out.println("Saving...");
-    }
-
-    public void exportFunction()
-    {
-        System.out.println("Exporting...");
-    }
-
-    public void renameFunction()
-    {
 
     }
 
