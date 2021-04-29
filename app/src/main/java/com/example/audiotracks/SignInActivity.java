@@ -25,6 +25,11 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 /**
  * SignInActivity connects to the google database to have the user sign in through their google account
+ * @author Ehab Hanhan
+ * @author Michael LaRussa
+ * @author Koshiro Kawai
+ * @author Sahej Hundal
+ * @version 1.0
  */
 public class SignInActivity extends AppCompatActivity{
     private static final String TAG = "SignInActivity";
@@ -38,8 +43,8 @@ public class SignInActivity extends AppCompatActivity{
 
 
     /**
-     * onCreate prompts the user to sign in to their google account
-     * @param savedInstanceState the user's current projects from last sign in !!!! PLEASE REVIEW !!!!
+     * onCreate creates the button to sign in
+     * @param savedInstanceState saves a state of the page
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,9 @@ public class SignInActivity extends AppCompatActivity{
         // Set click listeners
         mBinding.signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
+            /**
+             *  onClick prompts the user to sign in to their google account
+             */
             public void onClick(View view) {
                 signIn();
             }
@@ -72,9 +80,9 @@ public class SignInActivity extends AppCompatActivity{
 
     /**
      *  onActivityResult allows the user access to the application if user was able to sign in
-     * @param requestCode
-     * @param resultCode
-     * @param data
+     * @param requestCode tells the server which account we are signing in with
+     * @param resultCode unused
+     * @param data the account with which we are signing in with
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -95,8 +103,8 @@ public class SignInActivity extends AppCompatActivity{
     }
 
     /**
-     *
-     * @param acct
+     * firebaseAuthWithGoogle accesses the firebase database using a google account
+     * @param acct the google account used to sign in
      */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
@@ -104,13 +112,12 @@ public class SignInActivity extends AppCompatActivity{
         mFirebaseAuth.signInWithCredential(credential)
                 .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
                     /***
-                     *
-                     * @param authResult
+                     * If sign in succeeds the auth state listener will be notified and logic to handle the signed in user can be handled in the listener.
+                     * @param authResult the result of the authentication (success/unsuccessful)
                      */
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        // If sign in succeeds the auth state listener will be notified and logic to
-                        // handle the signed in user can be handled in the listener.
+
                         Log.d(TAG, "signInWithCredential:success");
                         startActivity(new Intent(SignInActivity.this, MainActivity.class));
                         finish();
@@ -118,12 +125,11 @@ public class SignInActivity extends AppCompatActivity{
                 })
                 .addOnFailureListener(this, new OnFailureListener() {
                     /**
-                     *
+                     * onFaliure If sign in fails, display a message to the user.
                      * @param e
                      */
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential", e);
                         Toast.makeText(SignInActivity.this, "Authentication failed.",
                                 Toast.LENGTH_SHORT).show();
@@ -132,7 +138,7 @@ public class SignInActivity extends AppCompatActivity{
     }
 
     /**
-     * signIn !!!! INSERT DESCRIPTION HERE !!!!
+     * signIn signs the user in
      */
     private void signIn() {
         Intent signInIntent = mSignInClient.getSignInIntent();

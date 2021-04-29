@@ -52,6 +52,11 @@ import java.util.UUID;
  *  The Project Editor function contains our audio manipulation tools
  *  it creates buttons for user input that control the audio
  *  to start recording, stop recording, play a single track or play all tracks
+ * @author Ehab Hanhan
+ * @author Michael LaRussa
+ * @author Koshiro Kawai
+ * @author Sahej Hundal
+ * @version 1.0
  */
 public class ProjectEditor extends AppCompatActivity {
     Button popupButton;
@@ -74,8 +79,8 @@ public class ProjectEditor extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
 
     /**
-     * onCreate
-     * @param savedInstanceState
+     * onCreate sets the text main button to the project title, then it requests permission to access the user's storage and microphone, finally calls the download function
+     * @param savedInstanceState saves a state of the page
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +117,7 @@ public class ProjectEditor extends AppCompatActivity {
 
     /**
      *  playFunction plays the selected audio track recorded by the user
-     * @param view !!!! INSERT DESCRIPTION HERE !!!!
+     * @param view stores the location of where this function called from
      */
     public void playFunction(View view)
     {
@@ -167,7 +172,7 @@ public class ProjectEditor extends AppCompatActivity {
 
     /**
      *  playAll plays all tracks recorded by the user on the current project
-     * @param view !!!! INSERT DESCRIPTION HERE !!!!
+     * @param view stores the location of where this function called from
      */
     public void playAll(View view) {
         Button playButton = findViewById(R.id.play_button);
@@ -253,7 +258,7 @@ public class ProjectEditor extends AppCompatActivity {
 
     /**
      * recordFunction records on the selected track of the current project
-     * @param view !!!! INSERT DESCRIPTION HERE !!!!
+     * @param view stores the location of where this function called from
      */
     public void recordFunction(View view)
     {
@@ -301,7 +306,7 @@ public class ProjectEditor extends AppCompatActivity {
 
     /**
      * popupMenu creates the popup menu with options to save, export, rename, or delete a project
-     * @param view !!!! INSERT DESCRIPTION HERE !!!!!
+     * @param view stores the location of where this function called from
      */
     public void popupMenu(View view) {
         popupButton = findViewById(R.id.project_button);
@@ -335,7 +340,7 @@ public class ProjectEditor extends AppCompatActivity {
     }
 
     /**
-     * requestPermission requests the user's permission to access their microphone
+     * requestPermission requests the user's permission to access their storage device as well as microphone
      */
     private void requestPermission(){
         ActivityCompat.requestPermissions(this, new String[]{
@@ -346,7 +351,7 @@ public class ProjectEditor extends AppCompatActivity {
 
 
     /**
-     * onRequestPermissionsResult !!!! INSERT DESCRIPTION HERE !!!!!
+     * onRequestPermissionsResult notifies the user if permission has been granted or not
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -386,13 +391,17 @@ public class ProjectEditor extends AppCompatActivity {
         storageReference.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             /**'
-             * onSuccess closes the popup menu
-             * @param taskSnapshot
+             * onSuccess gets the download url for a file uploaded and then passes it to the next onSuccess function
+             * @param taskSnapshot request to the database that contains all the specific information about the file that was just uploaded
              */
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 taskSnapshot.getMetadata().getReference().getDownloadUrl()
                         .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            /**
+                             *  onSuccess takes the url and puts it into the realtime database
+                             * @param uri url reference of the file that was just uploaded
+                             */
                             @Override
                             public void onSuccess(Uri uri) {
                                 System.out.println("hello");
@@ -423,7 +432,7 @@ public class ProjectEditor extends AppCompatActivity {
     }
 
     /**
-     *  deleteFunction deletes the current project
+     *  deleteFunction deletes all references to the current project
      */
     public void deleteFunction()
     {
@@ -440,7 +449,7 @@ public class ProjectEditor extends AppCompatActivity {
 
     /**
      *  selectTrack1 selects the first track
-     * @param view
+     * @param view stores the location of where this function called from
      */
     public void selectTrack1(View view) {
         Button track1 = findViewById(R.id.track1);
@@ -454,7 +463,7 @@ public class ProjectEditor extends AppCompatActivity {
 
     /**
      * selectTrack 2 selects the second track
-     * @param view
+     * @param view stores the location of where this function called from
      */
     public void selectTrack2(View view) {
         Button track1 = findViewById(R.id.track1);
@@ -468,7 +477,7 @@ public class ProjectEditor extends AppCompatActivity {
 
     /**
      * select 3 selects the third track
-     * @param view
+     * @param view stores the location of where this function called from
      */
     public void selectTrack3(View view) {
         Button track1 = findViewById(R.id.track1);
@@ -481,7 +490,7 @@ public class ProjectEditor extends AppCompatActivity {
     }
 
     /**
-     * downloadFunction downloads the project from the database onto local storage
+     * downloadFunction determines wheter files need to be downloaded from the database, and if so downloads the projects from the database onto local storage
      */
     public void downloadFunction() {
         Boolean tracksPresent[] = {null, null, null};
@@ -501,6 +510,10 @@ public class ProjectEditor extends AppCompatActivity {
         myRef.child(mFirebaseAuth.getCurrentUser().getUid())
                 .child("projects").child(currentProject.getName()).child("paths").get()
                 .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    /**
+                     * onComplete compares the tracks on the device and on the database to see which projects need to be downloaded
+                     * @param task paths to the audio files contained in the current project
+                     */
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
                         if(!task.isSuccessful()){

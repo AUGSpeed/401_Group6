@@ -8,6 +8,11 @@ package com.example.audiotracks;
  *  audio track is stored.
  *  It also has setters and getters for those variables and
  *  a add and remove function for audio tracks
+ *  @author Ehab Hanhan
+ *  @author Michael LaRussa
+ *  @author Koshiro Kawai
+ *  @author Sahej Hundal
+ *  @version 1.0
  */
 public class Project {
     String name = "";
@@ -15,7 +20,7 @@ public class Project {
 
     /**
      * addPath is used to store a new track
-     * @param path each path is the address of a new track !!!!! PLEASE REVIEW !!!!!
+     * @param path each path is the address of a new track
      * @param index is an index used to iterate through a list of paths
      */
     public void addPath(String path, int index)
@@ -35,8 +40,8 @@ public class Project {
     }
 
     /**
-     * getPath is used to return the address of a track !!!! PLEASE REVIEW !!!!!
-     * @param index
+     * getPath is used to return the address of a track
+     * @param index iterator used to parse through each path
      * @return
      */
     public String getPath(int index)
@@ -66,7 +71,7 @@ public class Project {
 
     /**
      * setPaths sets the path of a track to store it within the project
-     * @param path the address of the track !!!!PLEASE REVIEW !!!!!
+     * @param path the address of the track
      */
     public void setPaths(String path[]){
         paths = path;
