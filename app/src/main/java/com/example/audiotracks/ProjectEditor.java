@@ -528,7 +528,8 @@ public class ProjectEditor extends AppCompatActivity {
                                                 currentProject.getName() + "_audio_record" + i + ".3gp");
                                         downloadManager.enqueue(request);
                                         currentProject.addPath(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/"
-                                                + currentProject.getName() + "_audio_record" + currentTrack + ".3gp", i - 1);
+                                                + currentProject.getName() + "_audio_record" + i + ".3gp", i - 1);
+                                        System.out.println(currentProject.paths[i-1]);
 
                                         //Koshiro, put the Downloading stuff here, the file that needs to be downloaded can be found with child.getValue(), and the name it needs to have locally is trackName.
                                         System.out.println("In database, but not storage Current track testing: " + i);
