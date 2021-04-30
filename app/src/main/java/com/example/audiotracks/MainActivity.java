@@ -213,30 +213,6 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    /**
-     * getUserPhotoUrl() loads the user's profile picture from the google database
-     */
-    @Nullable
-    private String getUserPhotoUrl() {
-        FirebaseUser user = mFirebaseAuth.getCurrentUser();
-        if (user != null && user.getPhotoUrl() != null) {
-            return user.getPhotoUrl().toString();
-        }
 
-        return null;
-    }
-
-    /**
-     * getUserName() returns the user's name
-     * @return the  user's name
-     */
-    private String getUserName() {
-        FirebaseUser user = mFirebaseAuth.getCurrentUser();
-        if (user != null) {
-            return user.getDisplayName();
-        }
-
-        return ANONYMOUS;
-    }
 
 }
